@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'administrator', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
         ]);
 
-        $this->call(UserSeeder::class);
+        $this->call(UserSeeder::class); // Creates Users
         $this->call(ArtistSeeder::class); // Creates actors and directors
         $this->call(VideoSeeder::class); // Creates only for 'TV Shows 20x'
         $this->call(SeasonSeeder::class); // Creates seasons only for 'TV shows'

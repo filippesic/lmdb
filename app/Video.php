@@ -31,10 +31,10 @@ class Video extends Model
         return $this->belongsToMany(Genre::class)->withTimestamps();
     }
 
-    public function userRating()
-    {
-        $this->belongsToMany(User::class);
-    }
+//    public function userRating()
+//    {
+//        return $this->belongsToMany(User::class);
+//    }
 
     public function director()
     {

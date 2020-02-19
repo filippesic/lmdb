@@ -15,8 +15,7 @@ use Illuminate\Http\Request;
 //Route::middleware('auth:api')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
-Route::get('/asdf', 'VideoController@asdf');
-Route::get('/', 'VideoController@asdf');
+Route::get('/test', 'VideoController@asdf');
 
 Route::post('login', 'AuthController@login');
 Route::post('register', 'AuthController@register');

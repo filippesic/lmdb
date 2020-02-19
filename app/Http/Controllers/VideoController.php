@@ -102,6 +102,7 @@ class VideoController extends Controller
 
             'artists' => 'required|exists:artists,id|different:director_id',
             'trailer' => 'required|starts_with:https://www.youtube.com/embed/',
+            'episodes' => 'required_if:video_type_id,2',
 
         ])->validate();
 
@@ -117,6 +118,8 @@ class VideoController extends Controller
         $request->file('poster')->storePubliclyAs('/public/videoPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
 
         $video = Video::create($validator);
+
+        $season = $video->seasons()->create(['episodes' => $request->get('episodes')]); // Needs to be changed to be able to add more than one season per TV show
 
         $video->artists()->sync($request->get('artists'));
         $video->genres()->sync($request->get('genres'));
@@ -310,6 +313,6 @@ class VideoController extends Controller
     }
 
     public function asdf() {
-        //dd(request()->server('HTTP_HOST'));
+        dd(request()->server('HTTP_HOST'));
     }
 }

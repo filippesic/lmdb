@@ -71,6 +71,8 @@ class VideoController extends Controller
      */
     public function store(Request $request, Video $video)
     {
+
+        //dd($request->all());
         $this->authorize('create', $video);
 
         //$directors = Artist::where('artist_type_id', 2)->select('id')->get()->pluck('id');
@@ -119,7 +121,9 @@ class VideoController extends Controller
 
         $video = Video::create($validator);
 
-        $season = $video->seasons()->create(['episodes' => $request->get('episodes')]); // Needs to be changed to be able to add more than one season per TV show
+        foreach (request('episodes') as $episode) {
+            $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to add more than one season per TV show
+        }
 
         $video->artists()->sync($request->get('artists'));
         $video->genres()->sync($request->get('genres'));
@@ -143,7 +147,7 @@ class VideoController extends Controller
         return response([
             'id' => $video->id,
             'video_type_id' => $video->video_type_id,
-            'director_id JEL TI TREBA ZNACI NE?' => $video->director_id,
+            'director_id' => $video->director_id,
             'name' => $video->name,
             'poster' => $video->poster,
             'trailer' => $video->trailer,
@@ -238,15 +242,29 @@ class VideoController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Video  $video
+     * @param \App\Video $video
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Video $video)
     {
-        $video->delete();
+        //dd(Storage::disk('local')->delete('public/videoPosters/LYApdVF6zTaxQH0NNEs6w5fftZajIi29GXSjiuuS.jpeg'));
 
+        //dd($video->getOriginal('poster'));
+        //dd(public_path() . '/storage/videoPosters/' . $video->getOriginal('poster'));
+        //Storage::delete(storage_path() . '\\app\\public\\videoPosters\\' . $video->getOriginal('poster'));
+        //dd(is_file(storage_path() . '/app/public/videoPosters/' . $video->getOriginal('poster')));
+
+        if (is_file(storage_path() . '/app/public/videoPosters/' . $video->getOriginal('poster'))) {
+           Storage::delete('public/videoPosters/' . $video->getOriginal('poster'));
+        } else {
+            return response(['message' => 'File not deleted. It doesn\'t exist']);
+        }
+        //dd(Storage::delete('/public/storage/videoPosters/' . $video->getOriginal('poster')));
+        //Storage::delete(public_path() . '/storage/videoPosters/' . $video->getOriginal('poster'));
+        //dd(Storage::allDirectories());
+        $video->delete();
         return response([
-            'status' => 'success',
             'message' => 'Video successfully deleted!'
         ]);
     }

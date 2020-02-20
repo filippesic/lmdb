@@ -2,11 +2,34 @@
 
 ## About this project
 
-This is my second Laravel project, but it's the first REST API based (with lots of spaghetti code so be aware :)
+This is my second Laravel project, but it's the first REST API based so it's bound to have some bugs and general mistakes with lots of spaghetti code so be aware. :)
 
-## Contributing
+## Routes and initialization
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+You need to make `lmdb_db`(InnoDB) database and run `migrate`, `seed`, `passport install`, artisan commands first.
+
+For the routes, standard CRUD routes apply for all models with some custom ones.
+
+`/api/` prefix applies to all routes
+
+* `/login` generates a token for the registered user using Passport
+* `/register` registers a user
+* * *
+* `/artists` CRUD
+* `/videos` CRUD
+* `/genres` CRUD **(incomplete)**
+* `/users` CRUD (fixed a token deletion bug with admin)
+* * *
+* `/videos/search` typical search
+* `/videos/top` lists top videos
+* `/actors` lists only artists that are actors(artist_type_id) 
+* `/directors` lists only artists that are directors(artist_type_id)
+* `/user` shows some data about the logged user
+* `/user/rate` rates a movie(if the user is logged in) **needs update rate method**
+* `/user/rates` returns rates for authenticate user
+* `/user/rates2` takes `video_id` and returns any rates that user has given
+* `/user/unrate` unrates the movie
+
 
 ## Code of Conduct
 

@@ -26,9 +26,12 @@ Route::get('artists/directors', 'ArtistController@directors');
 Route::get('videos/top', 'VideoController@top');
 Route::get('artists/actors', 'ArtistController@actors');
 Route::get('videos/search', 'VideoController@search');
-Route::get('/user', 'UserController@user')->middleware('auth:api');
+Route::get('/user', 'UserController@show')->middleware('auth:api');
 Route::post('/user/rate', 'UserController@rate')->middleware('auth:api');
+Route::get('/user/rates', 'UserController@rates')->middleware('auth:api');
+Route::post('/user/rates2', 'UserController@rates2')->middleware('auth:api');
 Route::post('/user/unrate', 'UserController@unrate')->middleware('auth:api');
+Route::post('/user/updateRate', 'UserController@updateRate')->middleware('auth:api');
 
 
 Route::apiResource('users', 'UserController')->middleware('auth:api'); //->except(['store']);

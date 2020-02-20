@@ -25,16 +25,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -65,33 +55,23 @@ class UserController extends Controller
      * Display the specified resource.
      *
      * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
+     * @return // \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show()
     {
-        //$as = \App\User::with('rated')->get();
-        //$userWithRel = User::with('rated')->find($user);
-        //dd($as->random()->rated);
-        //return response($userWithRel);
-    }
+        //$user = auth()->user()->with('rated')->get()->pluck('rated.*.rated')->flatten();
+        return response(auth()->user());
+       //return response(auth()->user());
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(User $user)
-    {
-        //
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User  $user
+     * @param \Illuminate\Http\Request $request
+     * @param \App\User $user
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, User $user)
     {
@@ -120,16 +100,17 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\User  $user
+     * @param \App\User $user
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
 
-//        auth()->user()->tokens->each(function ($token, $key) {
-//            $token->delete();
-//        });
+       $user->tokens->each(function ($token, $key) {
+            $token->delete();
+        });
 
         $user->delete();
 
@@ -137,11 +118,6 @@ class UserController extends Controller
             return response(['message' => 'Profile delete by administrator user m8!']);
         }
         return response(['message' =>'Successfully deleted your profile']);
-    }
-
-    public function user()
-    {
-        return \request()->user();
     }
 
     public function rate(Video $video)
@@ -153,7 +129,14 @@ class UserController extends Controller
         //dd('here or not?');
 
         try {
+//            if(!auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')])) {
+//
+//                auth()->user()->rated()->detach(\request('video_id'));
+//                auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')]);
+//            }
+
             auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')]);
+
         } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
                 return response(['message' => 'You already rated the damn movie mate!']);
@@ -167,7 +150,7 @@ class UserController extends Controller
         return response(['message' => 'You rated a movie!']);
     }
 
-    public function unrate(Video $video)
+    public function unrate()
     {
         \request()->validate([
            'video_id' => 'required|integer',
@@ -175,16 +158,50 @@ class UserController extends Controller
         ]);
         //dd('here or not?');
 
-        auth()->user()->rated()->detach(\request('video_id'));
         try {
-            //
+            auth()->user()->rated()->detach(\request('video_id'));
         } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
                 return response(['message' => 'You already rated the damn movie mate!']);
             }
         }
 
-        return response(['message' => 'You remove the rating from this movie mate!']);
+        return response(['message' => 'You removed the rating from this movie mate!']);
+    }
+
+    public function rates()
+    {
+        //dd(auth()->user()->all());
+       // $user->with('rated')->get()->pluck('rated.*.rated')->flatten();
+
+        $rates = auth()->user()->rated->pluck('rated');
+        return response($rates);
+    }
+
+    public function rates2()
+    {
+        //dd(auth()->user()->all());
+       // $user->with('rated')->get()->pluck('rated.*.rated')->flatten();
+
+//        \request()->validate([
+//            'video_id' => 'required|integer'
+//        ]);
+
+        $video_id = \request('video_id');
+
+       if (auth()->user()->rated->pluck('rated')->contains('video_id', $video_id)) {
+           return response(auth()->user()->rated->pluck('rated')->where('video_id', $video_id)->flatten());
+       } else {
+           return response(['message' => 'No videos found mate!']);
+       }
+
+//        $rates = auth()->user()->rated->pluck('rated');
+//        return response($rates);
+    }
+
+    public function updateRate()
+    {
+
     }
 
 }

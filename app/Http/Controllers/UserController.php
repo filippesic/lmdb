@@ -123,31 +123,40 @@ class UserController extends Controller
     public function rate(Video $video)
     {
         \request()->validate([
-           'video_id' => 'required|integer',
-           'rate' => 'required|integer'
+           'video_id' => 'required|integer|nullable',
+           'rate' => 'required|integer|nullable'
         ]);
         //dd('here or not?');
 
-        try {
+//        try {
 //            if(!auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')])) {
 //
 //                auth()->user()->rated()->detach(\request('video_id'));
 //                auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')]);
 //            }
 
-            auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')]);
 
-        } catch (QueryException $e) {
-            if ($e->errorInfo[1] == 1062) {
-                return response(['message' => 'You already rated the damn movie mate!']);
+
+            if (auth()->user()->rated->pluck('rated')->contains('video_id', request('video_id'))) {
+                //dd('exists');
+                auth()->user()->rated()->updateExistingPivot(\request('video_id'), ['rate' => request('rate')]);
+                return response(['message' => 'You updated a movie']);
+            } else {
+                auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')]);
+                return response(['message' => 'You rated a movie']);
             }
-        }
 
-        if (\request('rate') <= 5) {
-            return response(['message' => 'Why are you such a douche mate, c\'mon?']);
-        }
+//        } catch (QueryException $e) {
+//            if ($e->errorInfo[1] == 1062) {
+//                return response(['message' => 'You already rated the damn movie mate!']);
+//            }
+//        }
 
-        return response(['message' => 'You rated a movie!']);
+//        if (\request('rate') <= 5) {
+//            return response(['message' => 'Why are you such a douche mate, c\'mon?']);
+//        }
+
+        //return response(['message' => 'You rated a movie!']);
     }
 
     public function unrate()
@@ -187,20 +196,61 @@ class UserController extends Controller
 //            'video_id' => 'required|integer'
 //        ]);
 
-        $video_id = \request('video_id');
+         \request()->validate([
+            'video_id' => 'required|integer'
+        ]);
 
-       if (auth()->user()->rated->pluck('rated')->contains('video_id', $video_id)) {
-           return response(auth()->user()->rated->pluck('rated')->where('video_id', $video_id)->flatten());
-       } else {
-           return response(['message' => 'No videos found mate!']);
+//        dd($video_id);
+
+        //dd(auth()->user()->rated->pluck('rated')->contains('video_id', \request('video_id')));
+
+        if (auth()->user()->rated->pluck('rated')->contains('video_id', \request('video_id'))) {
+            //dd('ima video');
+            return response(auth()->user()->rated->pluck('rated')->where('video_id', \request('video_id'))->flatten());
+        } else {
+           // dd('im here??');
+            return response(['message' => 'No videos found mate!'], 404);
        }
 
 //        $rates = auth()->user()->rated->pluck('rated');
 //        return response($rates);
     }
 
-    public function updateRate()
+//    public function updateRate()
+//    {
+//        request()->validate([
+//            'video_id' => 'required|integer',
+//            'rate' => 'required'
+//        ]);
+//
+//        //dd(\request('video_id'));
+//
+////        dd(auth()->user()->rated->pluck('rated')->contains('video_id', $video_id));
+////
+////        if (auth()->user()->rated()->contains('video_id', $video_id)) {
+////
+////        }
+//            auth()->user()->rated()->updateExistingPivot(\request('video_id'), ['rate' => request('rate')]);
+//
+//            return response(['message' => 'Successfully rated a movie']);
+//
+//            //return response(['message' => 'Rate update failed, it\'s on the backend!'], 500);
+//
+//    }
+
+    public function addToList()
     {
+        \request()->validate([
+            'video_id' => 'required|integer|exists:videos,id'
+        ]);
+
+        $message = auth()->user()->watchlist()->toggle(\request('video_id'));
+
+        if ($message['attached'] == null) {
+            return response(['message' => 'You deleted a movie from watchlist'], 410);
+        } else {
+            return response(['message' => 'You added a movie to your watchlist']);
+        }
 
     }
 

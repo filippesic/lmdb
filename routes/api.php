@@ -31,7 +31,8 @@ Route::post('/user/rate', 'UserController@rate')->middleware('auth:api');
 Route::get('/user/rates', 'UserController@rates')->middleware('auth:api');
 Route::post('/user/rates2', 'UserController@rates2')->middleware('auth:api');
 Route::post('/user/unrate', 'UserController@unrate')->middleware('auth:api');
-Route::post('/user/updateRate', 'UserController@updateRate')->middleware('auth:api');
+Route::put('/user/updateRate', 'UserController@updateRate')->middleware('auth:api');
+Route::post('/user/addToList', 'UserController@addToList')->middleware('auth:api');
 
 
 Route::apiResource('users', 'UserController')->middleware('auth:api'); //->except(['store']);
@@ -41,14 +42,4 @@ Route::apiResource('videos', 'VideoController');
 
 
 //Route::get('videos/average/{video}', 'VideoController@average');
-
-
-//Route::middleware('auth:api')->group(function () {
-//
-//    Route::get('users', 'UserController@index');
-//    Route::get('users/{user}', 'UserController@show');
-//    Route::delete('users/{user}', 'UserController@destory');
-//    Route::put('users/{user}', 'UserController@update');
-//
-//});
 

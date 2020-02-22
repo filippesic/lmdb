@@ -29,7 +29,7 @@ class VideoController extends Controller
      */
     public function index()
     {
-        $dd = collect();
+         $dd = collect();
 
         $videos = Video::with('type', 'artists', 'director', 'genres', 'seasons')->get();
 
@@ -74,9 +74,9 @@ class VideoController extends Controller
             'name' => 'required|min:3',
             //'rating' => 'required|integer', // Should be calculated in the background from the 'rates' table!
             'genres' => 'required|exists:genres,id|max:3',
-            'mpaa_rating' => ['required', Rule::in('PG', 'PG-13', 'A', 'R', 'NR')],
+            'mpaa_rating' => ['required', Rule::in('PG', 'PG-13', 'A', 'R', 'NR', 'TV-MA', 'G')],
             'duration_in_minutes' => 'required|integer',
-            'release_date' => 'required',
+            'release_date' => 'required|date',
             'country' => 'required|min:2',
             'plot' => 'required|string',
 //            'director_id' => ['required', function ($attribute, $value, $fail) {
@@ -111,8 +111,10 @@ class VideoController extends Controller
 
         $video = Video::create($validator);
 
-        foreach (request('episodes') as $episode) {
-            $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to add more than one season per TV show
+        if (request('episodes')) {
+            foreach (request('episodes') as $episode) {
+                $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to add more than one season per TV show
+            }
         }
 
         $video->artists()->sync($request->get('artists'));

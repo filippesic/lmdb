@@ -28,8 +28,9 @@ class GenreController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(Request $request, Genre $genre)
     {
@@ -81,8 +82,9 @@ class GenreController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Genre  $genre
+     * @param \App\Genre $genre
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Genre $genre)
     {

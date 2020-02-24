@@ -72,7 +72,6 @@ class UserController extends Controller
             'watchlist' => $watchlist,
         ]);
 
-
     }
 
     /**
@@ -257,9 +256,9 @@ class UserController extends Controller
         $message = auth()->user()->watchlist()->toggle(\request('video_id'));
 
         if ($message['attached'] == null) {
-            return response(['message' => 'You deleted a movie from watchlist'], 200);
+            return response(['message' => 'You deleted a movie from watchlist mate'], 200);
         } else {
-            return response(['message' => 'You added a movie to your watchlist'], 201);
+            return response(['message' => 'You added a movie to your watchlist mate'], 201);
         }
 
     }

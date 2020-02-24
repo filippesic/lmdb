@@ -6,7 +6,8 @@ This is my second Laravel project, but it's the first REST API based so it's bou
 
 ## Routes and initialization
 
-You need to make (L)`lmdb_db`(InnoDB) database and run `migrate`, `seed`, `passport install`, artisan commands first. Password for all users is `321`. 
+You need to make (L)`lmdb_db`(InnoDB) database and run `migrate`, `seed`, `passport install`, artisan commands first. Password for all users is `321`.
+There are two roles for users which defaults to `role_id` `1`, but you can manually set it to `2`, which is administrator which has basically all privileges.
 
 For the routes, standard CRUD routes apply for all(most) models with some custom ones.
 
@@ -18,18 +19,18 @@ For the routes, standard CRUD routes apply for all(most) models with some custom
 * * *
 * `/artists` CRUD (policy)
 * `/videos` CRUD (policy)
-* `/genres` CRUD **(incomplete)**
+* `/genres` CRUD (policy)
 * `/users` CRUD (policy)(fixed a token deletion bug with admin)
 * * *
 * `GET /videos/search` typical search
 * `GET /videos/top` lists top videos
 * `GET /actors` lists only artists that are actors(artist_type_id) 
 * `GET /directors` lists only artists that are directors(artist_type_id)
-* `POST /user` shows some data about the user(`auth:api`)
+* `POST /user` shows some data about the user with relationship(`auth:api`)
 * `POST /user/rate` rates a movie(`auth:api`) ~~needs update rate method~~, rates and updates now
 * `POST /user/rates` returns rates for the user(`auth:api`)
 * `POST /user/rates2` takes `video_id` and returns any rates that user has given(`auth:api`)
-* `POST /user/unrate` unrates the movie(`auth:api`)
+* `POST /user/unrate` 'unrates' the movie(`auth:api`)
 * `POST /user/addToList` takes `video_id` and adds a movie to user's watchlist(`auth:api`)
 
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Artist;
 use App\Rate;
-use App\Rules\DirectorCheck;
 use App\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -94,7 +93,7 @@ class VideoController extends Controller
 
             'artists' => 'required|exists:artists,id|different:director_id',
             'trailer' => 'required|starts_with:https://www.youtube.com/embed/',
-            'episodes' => 'required_if:video_type_id,2',
+            'episodes' => 'array|required_if:video_type_id,2',
 
         ])->validate();
 
@@ -195,19 +194,22 @@ class VideoController extends Controller
 
             'artists' => 'required|exists:artists,id|different:director_id',
             'trailer' => 'required',
+            'episodes' => 'array|required_if:video_type_id,2',
 
         ])->validate();
 
         //dd('not here right?');
+        $request->file('poster')->storePubliclyAs('/public/videoPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
 
         $video->video_type_id = $validator['video_type_id'];
-        $video->poster = $request->file('poster')->storePubliclyAs('/public/videoPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
+        $video->poster = $validator['poster'];
         $video->name = $validator['name'];
         $video->mpaa_rating = $validator['mpaa_rating'];
         $video->duration_in_minutes = $validator['duration_in_minutes'];
         $video->country = $validator['country'];
         $video->plot = $validator['plot'];
         $video->director_id = $validator['director_id'];
+        $video->trailer = $validator['trailer'];
 //        if($request->get('rate') !== null) {
 //            $video->rates()->attach(327, ['rate' => $request->get('rate')]);
 //            $video->rating = DB::table('rates')->select('rate')->where('video_id', $video->id)->avg('rate');
@@ -216,6 +218,17 @@ class VideoController extends Controller
 //        }
 
         $video->save();
+
+        if (request('episodes')) {
+            foreach (request('episodes') as $episode) {
+                $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to add more than one season per TV show
+            }
+        } else {
+            $video->seasons()->delete();
+        }
+
+        $video->artists()->sync($request->get('artists'));
+        $video->genres()->sync($request->get('genres'));
 
         return response($video);
     }

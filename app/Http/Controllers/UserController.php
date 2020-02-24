@@ -115,7 +115,7 @@ class UserController extends Controller
         $user->delete();
 
         if(auth()->user()->role->id === 2) {
-            return response(['message' => 'Profile delete by administrator user m8!']);
+            return response(['message' => 'Profile deleted by administrator user m8!']);
         }
         return response(['message' =>'Successfully deleted your profile']);
     }

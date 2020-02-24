@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use App\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class GenreController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api')->only(['store', 'update', 'destroy']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -25,9 +31,17 @@ class GenreController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Genre $genre)
     {
-        //
+        $this->authorize('create', $genre);
+
+        $validated = $request->validate([
+           'name' => 'required|string|unique:genres,name'
+        ]);
+
+        Genre::create($validated);
+
+        return response(['message' => 'Genre successfully created mate']);
     }
 
     /**
@@ -52,7 +66,16 @@ class GenreController extends Controller
      */
     public function update(Request $request, Genre $genre)
     {
-        //
+
+
+        $request->validate([
+            'name' => 'required|string'
+        ]);
+
+        $genre->name = $request->get('name');
+        $genre->save();
+
+        return  response(['message' => 'You edited the genre successfully mate!']);
     }
 
     /**
@@ -63,6 +86,8 @@ class GenreController extends Controller
      */
     public function destroy(Genre $genre)
     {
-        //
+        $genre->delete();
+
+        return response(['message' => 'Genre successfully deleted mate']);
     }
 }

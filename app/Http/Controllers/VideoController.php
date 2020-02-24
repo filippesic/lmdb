@@ -28,26 +28,12 @@ class VideoController extends Controller
      */
     public function index()
     {
-         $dd = collect();
-
-        $videos = Video::with('type', 'artists', 'director', 'genres', 'seasons')->get();
-
         $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
             ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
             ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))
             ->groupBy('videos.id')->orderBy('rating_avg', 'desc')
             ->paginate(20);
 
-//        foreach ($videos as $id => $video) {
-//            $dd->push(DB::table('rates')->select('rate')->where('video_id', $video->id)->limit(20)->avg('rate'));
-//            $video->rating_avg = $dd[$id];
-//            //return $rates = collect($video->rates()->pluck('rate'))->all();
-//        }
-
-        //W$rates = Video::with('rates')->get()->pluck('rates.*.rates');
-      //  DB::table('rates')->select('rate')->where('video_id', $video->id)->avg('rate');
-
-        //return view('welcome', compact('videos'));
         return response($query);
     }
 
@@ -60,18 +46,12 @@ class VideoController extends Controller
      */
     public function store(Request $request, Video $video)
     {
-
-        //dd($request->all());
         $this->authorize('create', $video);
-
-        //$directors = Artist::where('artist_type_id', 2)->select('id')->get()->pluck('id');
-        //return response(dd(public_path()));
 
         $validator = Validator::make($request->all(), [
             'video_type_id' => 'required',
             'poster' => 'required|image',
             'name' => 'required|min:3',
-            //'rating' => 'required|integer', // Should be calculated in the background from the 'rates' table!
             'genres' => 'required|exists:genres,id|max:3',
             'mpaa_rating' => ['required', Rule::in('PG', 'PG-13', 'A', 'R', 'NR', 'TV-MA', 'G')],
             'duration_in_minutes' => 'required|integer',
@@ -97,15 +77,6 @@ class VideoController extends Controller
 
         ])->validate();
 
-        //dd($request->file('poster')->guessClientExtension());
-        //$posterName = request()->file('poster')->getClientOriginalName();
-        //request()->poster->move(public_path('/storage/images/videoPosters'), $posterName);
-        //$validator['poster'] = time() . '_' . Str::random(40) . $request->file('poster')->guessClientExtension();
-        //$artists = explode(',', $request->get('artists'));
-        //$validator['artists'] = $artists;
-        // dd($request->file('poster'));
-        //dd(public_path('storage\images\videoPosters'));
-
         $request->file('poster')->storePubliclyAs('/public/videoPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
 
         $video = Video::create($validator);
@@ -130,8 +101,6 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
-
-        //dd(request()->server('SERVER_ADDR'));
         $collection = collect($video->rates()->pluck('rate'));
 
         $videoWithRel = Video::with('type', 'rates', 'artists', 'director', 'genres', 'seasons')->findOrFail($video->id);
@@ -167,12 +136,11 @@ class VideoController extends Controller
     public function update(Request $request, Video $video)
     {
         $this->authorize('create', $video);
-        //dd($request->all());
+
         $validator = Validator::make($request->all(), [
             'video_type_id' => 'required',
             'poster' => 'required|image',
             'name' => 'required|min:3',
-            //'rating' => 'required|integer', // Should be calculated in the background from the 'rates' table!
             'genres' => 'required|exists:genres,id|max:3',
             'mpaa_rating' => ['required', Rule::in('PG', 'PG-13', 'A', 'R', 'NR')],
             'duration_in_minutes' => 'required|integer',
@@ -198,7 +166,6 @@ class VideoController extends Controller
 
         ])->validate();
 
-        //dd('not here right?');
         $request->file('poster')->storePubliclyAs('/public/videoPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
 
         $video->video_type_id = $validator['video_type_id'];
@@ -210,18 +177,12 @@ class VideoController extends Controller
         $video->plot = $validator['plot'];
         $video->director_id = $validator['director_id'];
         $video->trailer = $validator['trailer'];
-//        if($request->get('rate') !== null) {
-//            $video->rates()->attach(327, ['rate' => $request->get('rate')]);
-//            $video->rating = DB::table('rates')->select('rate')->where('video_id', $video->id)->avg('rate');
-//            $video->update(['rating' => avg()])
-//            //dd('here mate?');
-//        }
 
         $video->save();
 
         if (request('episodes')) {
             foreach (request('episodes') as $episode) {
-                $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to add more than one season per TV show
+                $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to edit per season, not just add new seasons indefinitely
             }
         } else {
             $video->seasons()->delete();
@@ -286,42 +247,6 @@ class VideoController extends Controller
         } else {
             return response(['message' => 'No search query mate']);
         }
-    }
-
-    public function average(Video $video)
-    {
-        $ratesNew = [];
-//        foreach ($video->rates as $rate) {
-//            return response($rate);
-//
-//        }
-
-        $collection = collect($video->rates()->pluck('rate'));
-            return response([
-          'average' => $collection->avg()
-        ]);
-    }
-
-    public function averageAll() {
-        //  DB::table('rates')->select('rate')->where('video_id', $video->id)->avg('rate');
-
-        $rates = Video::with('rates')->get()->pluck('rates.*.rates')->flatten();        // video_id, user_id, rate
-        $videos = Video::with('type', 'artists', 'director', 'genres', 'seasons', 'rates')->get();
-
-
-        $dd = collect();
-        foreach ($videos as $id => $video) {
-            $dd->push(DB::table('rates')->select('rate')->where('video_id', $video->id)->avg('rate'));
-
-            //return $rates = collect($video->rates()->pluck('rate'))->all();
-        }
-        return response()->json($dd);
-        //return response($rates2);
-
-
-        //return view('welcome', compact('videos'));
-        //return response($rates[0]->video_id);
-       // return response($videos);
     }
 
     public function asdf() {

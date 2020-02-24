@@ -46,7 +46,6 @@ class UserController extends Controller
             'email' => $validator['email'],
             'password' => Hash::make($validator['password'])
         ]);
-        //$rates = DB::table('rates')->select('rate')->where('video_id', 5)->avg('rate');
 
         return response($user);
 
@@ -60,7 +59,6 @@ class UserController extends Controller
      */
     public function show()
     {
-        //$user = auth()->user()->with('rated')->get()->pluck('rated.*.rated')->flatten();
         $watchlist = collect(\auth()->user()->watchlist->pluck('id'));
         $user = \auth()->user();
 
@@ -71,7 +69,6 @@ class UserController extends Controller
             'email' => $user->email,
             'watchlist' => $watchlist,
         ]);
-
     }
 
     /**
@@ -135,17 +132,6 @@ class UserController extends Controller
            'video_id' => 'required|integer|nullable',
            'rate' => 'required|integer|nullable'
         ]);
-        //dd('here or not?');
-
-//        try {
-//            if(!auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')])) {
-//
-//                auth()->user()->rated()->detach(\request('video_id'));
-//                auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')]);
-//            }
-
-
-
             if (auth()->user()->rated->pluck('rated')->contains('video_id', request('video_id'))) {
                 //dd('exists');
                 auth()->user()->rated()->updateExistingPivot(\request('video_id'), ['rate' => request('rate')]);
@@ -154,27 +140,13 @@ class UserController extends Controller
                 auth()->user()->rated()->attach(\request('video_id'), ['rate' => \request('rate')]);
                 return response(['message' => 'You rated a movie']);
             }
-
-//        } catch (QueryException $e) {
-//            if ($e->errorInfo[1] == 1062) {
-//                return response(['message' => 'You already rated the damn movie mate!']);
-//            }
-//        }
-
-//        if (\request('rate') <= 5) {
-//            return response(['message' => 'Why are you such a douche mate, c\'mon?']);
-//        }
-
-        //return response(['message' => 'You rated a movie!']);
     }
 
     public function unrate()
     {
         \request()->validate([
            'video_id' => 'required|integer',
-           //'rate' => 'required|integer'
         ]);
-        //dd('here or not?');
 
         try {
             auth()->user()->rated()->detach(\request('video_id'));
@@ -189,63 +161,22 @@ class UserController extends Controller
 
     public function rates()
     {
-        //dd(auth()->user()->all());
-       // $user->with('rated')->get()->pluck('rated.*.rated')->flatten();
-
         $rates = auth()->user()->rated->pluck('rated');
         return response($rates);
     }
 
     public function rates2()
     {
-        //dd(auth()->user()->all());
-       // $user->with('rated')->get()->pluck('rated.*.rated')->flatten();
-
-//        \request()->validate([
-//            'video_id' => 'required|integer'
-//        ]);
-
          \request()->validate([
             'video_id' => 'required|integer'
         ]);
 
-//        dd($video_id);
-
-        //dd(auth()->user()->rated->pluck('rated')->contains('video_id', \request('video_id')));
-
         if (auth()->user()->rated->pluck('rated')->contains('video_id', \request('video_id'))) {
-            //dd('ima video');
             return response(auth()->user()->rated->pluck('rated')->where('video_id', \request('video_id'))->flatten());
         } else {
-           // dd('im here??');
             return response(['message' => 'No videos found mate!'], 404);
        }
-
-//        $rates = auth()->user()->rated->pluck('rated');
-//        return response($rates);
     }
-
-//    public function updateRate()
-//    {
-//        request()->validate([
-//            'video_id' => 'required|integer',
-//            'rate' => 'required'
-//        ]);
-//
-//        //dd(\request('video_id'));
-//
-////        dd(auth()->user()->rated->pluck('rated')->contains('video_id', $video_id));
-////
-////        if (auth()->user()->rated()->contains('video_id', $video_id)) {
-////
-////        }
-//            auth()->user()->rated()->updateExistingPivot(\request('video_id'), ['rate' => request('rate')]);
-//
-//            return response(['message' => 'Successfully rated a movie']);
-//
-//            //return response(['message' => 'Rate update failed, it\'s on the backend!'], 500);
-//
-//    }
 
     public function addToList()
     {

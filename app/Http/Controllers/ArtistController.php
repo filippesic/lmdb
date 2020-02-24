@@ -24,8 +24,6 @@ class ArtistController extends Controller
     {
         $artists = Artist::with('type', 'videos')->paginate(20);
 
-        //dd($rates = DB::table('rates')->select('rate')->where('video_id', 5)->avg('rate'));
-
         return response($artists);
     }
 
@@ -41,16 +39,6 @@ class ArtistController extends Controller
     {
         $this->authorize('create', $artist);
 
-//        $validatedData = $request->validate([
-//            'artist_type_id' => 'required',
-//            'poster' => 'required',
-//            'name' => 'required',
-//            'surname' => 'required',
-//            'gender' => 'required',
-//            'birth_date' => 'required',
-//            'country' => 'required',
-//        ]);
-
         $validator = Validator::make($request->all(), [
             'artist_type_id' => 'required|numeric',
             'poster' => 'required|image',
@@ -61,10 +49,6 @@ class ArtistController extends Controller
             'bio' => 'required|string',
             'country' => 'required|min:2'
         ])->validate();
-
-//        if($validation->fails()) {
-//            return redirect('videos')->withErrors($validation)->withInput();
-//        }
 
         $request->file('poster')->storePubliclyAs('/public/artistsPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
 
@@ -136,7 +120,6 @@ class ArtistController extends Controller
         $artist->delete();
 
         return response([
-            'status' => 'success',
             'message' => 'Artist successfully deleted!'
         ]);
     }

@@ -49,8 +49,6 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        //dd('yes am actually here mate!');
-        //return User::find(5)->role->id === 1;
         return auth()->user()->role->id === 2;
     }
 

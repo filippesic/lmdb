@@ -22,6 +22,7 @@ class GenreController extends Controller
     public function index()
     {
         $genresWithRel = Genre::with('videos')->get();
+
         return response($genresWithRel);
     }
 
@@ -29,6 +30,7 @@ class GenreController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
+     * @param Genre $genre
      * @return \Illuminate\Http\Response
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -67,8 +69,6 @@ class GenreController extends Controller
      */
     public function update(Request $request, Genre $genre)
     {
-
-
         $request->validate([
             'name' => 'required|string'
         ]);

@@ -7,6 +7,7 @@ use App\Video;
 use Dotenv\Validator;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -55,14 +56,13 @@ class UserController extends Controller
      * Display the specified resource.
      *
      * @param  \App\User  $user
-     * @return // \Illuminate\Http\Response
+     * @return  \Illuminate\Http\Response
      */
     public function show()
     {
         //$user = auth()->user()->with('rated')->get()->pluck('rated.*.rated')->flatten();
-        return response(auth()->user());
+        return response(auth()->user()->load('watchlist'));
        //return response(auth()->user());
-
     }
 
     /**

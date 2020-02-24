@@ -56,13 +56,23 @@ class UserController extends Controller
      * Display the specified resource.
      *
      * @param  \App\User  $user
-     * @return  \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show()
     {
         //$user = auth()->user()->with('rated')->get()->pluck('rated.*.rated')->flatten();
-        return response(auth()->user()->load('watchlist'));
-       //return response(auth()->user());
+        $watchlist = collect(\auth()->user()->watchlist->pluck('id'));
+        $user = \auth()->user();
+
+        return  response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'surname' => $user->surname,
+            'email' => $user->email,
+            'watchlist' => $watchlist,
+        ]);
+
+
     }
 
     /**

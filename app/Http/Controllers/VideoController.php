@@ -83,7 +83,7 @@ class VideoController extends Controller
 
         if (request('episodes')) {
             foreach (request('episodes') as $episode) {
-                $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to add more than one season per TV show
+                $season = $video->seasons()->create(['episodes' => $episode]);
             }
         }
 
@@ -101,6 +101,7 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
+       // dd($video->load('seasons'));
         $collection = collect($video->rates()->pluck('rate'));
 
         $videoWithRel = Video::with('type', 'rates', 'artists', 'director', 'genres', 'seasons')->findOrFail($video->id);
@@ -135,7 +136,7 @@ class VideoController extends Controller
      */
     public function update(Request $request, Video $video)
     {
-        $this->authorize('create', $video);
+        $this->authorize('update', $video);
 
         $validator = Validator::make($request->all(), [
             'video_type_id' => 'required',
@@ -177,21 +178,37 @@ class VideoController extends Controller
         $video->plot = $validator['plot'];
         $video->director_id = $validator['director_id'];
         $video->trailer = $validator['trailer'];
+        $video->seasons()->delete();
 
         $video->save();
+        //dd($validator['episodes']);
 
-        if (request('episodes')) {
-            foreach (request('episodes') as $episode) {
-                $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to edit per season, not just add new seasons indefinitely
-            }
-        } else {
+        if ($video->video_type_id == 1) {
             $video->seasons()->delete();
+        } else {
+            if (\request('episodes')) {
+                foreach ($validator['episodes'] as $episode) {
+                    $video->seasons()->create(['episodes' => $episode]);
+                }
+            }
         }
+
+//        if (request('episodes') && !$video->seasons()->exists()) {
+//            foreach (request('episodes') as $episode) {
+//                $season = $video->seasons()->create(['episodes' => $episode]); // Needs to be changed to be able to edit per season, not just add new seasons indefinitely
+//            }
+//        } elseif(\request('episodes') && $video->seasons()->exists()) {
+//            if(\request('season_id') && ) {
+//
+//            }
+//        } else {
+//            $video->seasons()->delete();
+//        }
 
         $video->artists()->sync($request->get('artists'));
         $video->genres()->sync($request->get('genres'));
 
-        return response($video);
+        return response($video->load('artists', 'genres', 'seasons'));
     }
 
     /**
@@ -210,15 +227,18 @@ class VideoController extends Controller
         //Storage::delete(storage_path() . '\\app\\public\\videoPosters\\' . $video->getOriginal('poster'));
         //dd(is_file(storage_path() . '/app/public/videoPosters/' . $video->getOriginal('poster')));
 
-        if (is_file(storage_path() . '/app/public/videoPosters/' . $video->getOriginal('poster'))) {
-           Storage::delete('public/videoPosters/' . $video->getOriginal('poster'));
-        } else {
-            return response(['message' => 'File not deleted. It doesn\'t exist']);
-        }
         //dd(Storage::delete('/public/storage/videoPosters/' . $video->getOriginal('poster')));
         //Storage::delete(public_path() . '/storage/videoPosters/' . $video->getOriginal('poster'));
         //dd(Storage::allDirectories());
+
+        if (is_file(storage_path() . '/app/public/videoPosters/' . $video->getOriginal('poster'))) {
+            Storage::delete('public/videoPosters/' . $video->getOriginal('poster'));
+        } else {
+            return response(['message' => 'File not deleted. It doesn\'t exist']);
+        }
+        $video->seasons()->delete();
         $video->delete();
+
         return response([
             'message' => 'Video successfully deleted!'
         ]);

@@ -6,7 +6,8 @@
 /vendor/
 node_modules/
 npm-debug.log
-yarn-error.log
+yarn-error.
+.idea/workspace.xml
 
 # Laravel 4 specific
 bootstrap/compiled.php

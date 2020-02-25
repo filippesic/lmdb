@@ -220,6 +220,7 @@ class VideoController extends Controller
      */
     public function destroy(Video $video)
     {
+        $this->authorize('delete', $video);
         //dd(Storage::disk('local')->delete('public/videoPosters/LYApdVF6zTaxQH0NNEs6w5fftZajIi29GXSjiuuS.jpeg'));
 
         //dd($video->getOriginal('poster'));

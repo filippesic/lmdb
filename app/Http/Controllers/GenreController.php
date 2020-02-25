@@ -38,11 +38,13 @@ class GenreController extends Controller
     {
         $this->authorize('create', $genre);
 
-        $validated = $request->validate([
-           'name' => 'required|string|unique:genres,name'
-        ]);
+        $validated = array_unique($request->validate([
+           'name' => 'required|array|unique:genres,name'
+        ]));
 
-        Genre::create($validated);
+        foreach (array_unique($validated['name']) as $genre) {
+            Genre::create(['name' => $genre]);
+        }
 
         return response(['message' => 'Genre successfully created mate']);
     }
@@ -63,12 +65,15 @@ class GenreController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Genre  $genre
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Genre $genre
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, Genre $genre)
     {
+        $this->authorize('update', $genre);
+
         $request->validate([
             'name' => 'required|string'
         ]);
@@ -88,6 +93,8 @@ class GenreController extends Controller
      */
     public function destroy(Genre $genre)
     {
+        $this->authorize('delete', $genre);
+        
         $genre->delete();
 
         return response(['message' => 'Genre successfully deleted mate']);

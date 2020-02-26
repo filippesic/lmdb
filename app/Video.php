@@ -31,11 +31,6 @@ class Video extends Model
         return $this->belongsToMany(Genre::class)->withTimestamps();
     }
 
-//    public function userRating()
-//    {
-//        return $this->belongsToMany(User::class);
-//    }
-
     public function director()
     {
         return $this->belongsTo(Artist::class, 'director_id');
@@ -59,4 +54,9 @@ class Video extends Model
     {
         return $this->belongsToMany(User::class)->as('users');
     }
+
+//    public function episodes()
+//    {
+//        return $this->hasManyThrough(Episode::class, Season::class);
+//    }
 }

@@ -104,7 +104,7 @@ class VideoController extends Controller
        // dd($video->load('seasons'));
         $collection = collect($video->rates()->pluck('rate'));
 
-        $videoWithRel = Video::with('type', 'rates', 'artists', 'director', 'genres', 'seasons')->findOrFail($video->id);
+        $videoWithRel = $video->load('type', 'rates', 'artists', 'director', 'genres', 'seasons.episodes')->findOrFail($video->id);
         return response([
             'id' => $video->id,
             'video_type_id' => $video->video_type_id,
@@ -118,11 +118,12 @@ class VideoController extends Controller
             'release_date' => $video->release_date,
             'country' => $video->country,
             'plot' => $video->plot,
-            'type' => $video->type()->get(),
-            'artists' => $video->artists()->get(),
-            'director' => $video->director()->get(),
-            'genres' => $video->genres()->get(),
-            'seasons' => $video->seasons()->get(),
+            'type' => $video->type,
+            'artists' => $video->artists,
+            'director' => $video->director,
+            'genres' => $video->genres,
+            'seasons' => $video->seasons
+            //'seasons' => $video->load('seasons.episodes'),
         ]);
     }
 

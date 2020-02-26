@@ -18,7 +18,7 @@ For the routes, standard CRUD routes apply for all(most) models with some custom
 * `POST /register` registers a user
 * * *
 * `/artists` CRUD (policy)
-* `/videos` CRUD (policy) *season episodes are just numbers*
+* `/videos` CRUD (policy) *~~season episodes are just numbers~~* **initial change**
 * `/genres` CRUD (policy)
 * `/users` CRUD (policy)
 * * *

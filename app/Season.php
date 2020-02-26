@@ -13,4 +13,10 @@ class Season extends Model
     {
         return $this->belongsTo(Video::class);
     }
+
+    public function episodes()
+    {
+        return $this->hasMany(Episode::class);
+    }
+
 }

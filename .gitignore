@@ -5,6 +5,7 @@
 ### Laravel ###
 /vendor/
 node_modules/
+.idea/
 npm-debug.log
 yarn-error.
 .idea/workspace.xml

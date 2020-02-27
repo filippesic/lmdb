@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Season extends Model
 {
 
-    protected $fillable = ['episodes'];
+    protected $fillable = ['season_number'];
 
     public function video()
     {

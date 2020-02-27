@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Artist;
+use App\Episode;
 use App\Rate;
 use App\Video;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use phpDocumentor\Reflection\Types\Collection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use function Sodium\increment;
 
 class VideoController extends Controller
 {
@@ -46,6 +48,8 @@ class VideoController extends Controller
      */
     public function store(Request $request, Video $video)
     {
+        //dd(\request()->all());
+        //return  response(request()->all());
         $this->authorize('create', $video);
 
         $validator = Validator::make($request->all(), [
@@ -73,7 +77,7 @@ class VideoController extends Controller
 
             'artists' => 'required|exists:artists,id|different:director_id',
             'trailer' => 'required|starts_with:https://www.youtube.com/embed/',
-            'episodes' => 'array|required_if:video_type_id,2',
+            //'episodes' => 'array|required_if:video_type_id,2',
 
         ])->validate();
 
@@ -81,9 +85,20 @@ class VideoController extends Controller
 
         $video = Video::create($validator);
 
-        if (request('episodes')) {
-            foreach (request('episodes') as $episode) {
-                $season = $video->seasons()->create(['episodes' => $episode]);
+        if (request('seasons')) {
+            foreach (request('seasons') as $key => $season) {
+                if (!$video->seasons()->exists()) {
+                    $video->seasons()->create(['season_number' => $key + 1]);
+                }
+                foreach ($season['episodes'] as $key2 => $episodeName) {
+                    //dd($video->seasons->id);
+                    $ep = new Episode();
+                    $ep->season()->associate($video->seasons[0]);
+                    //$ep->season_id = $video->seasons()->id;
+                    $ep->name = $episodeName;
+                    $ep->save();
+                }
+                //$season = $video->seasons()->create(['episodes' => $episode]);
             }
         }
 
@@ -101,7 +116,7 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
-       // dd($video->load('seasons'));
+       //dd(\request()->all());
         $collection = collect($video->rates()->pluck('rate'));
 
         $videoWithRel = $video->load('type', 'rates', 'artists', 'director', 'genres', 'seasons.episodes')->findOrFail($video->id);

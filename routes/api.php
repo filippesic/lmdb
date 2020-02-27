@@ -27,6 +27,7 @@ Route::get('videos/top', 'VideoController@top');
 Route::get('artists/actors', 'ArtistController@actors');
 Route::get('videos/search', 'VideoController@search');
 Route::get('/user', 'UserController@show')->middleware('auth:api');
+Route::get('/user/list', 'UserController@list')->middleware('auth:api');
 Route::post('/user/rate', 'UserController@rate')->middleware('auth:api');
 Route::get('/user/rates', 'UserController@rates')->middleware('auth:api');
 Route::post('/user/rates2', 'UserController@rates2')->middleware('auth:api');

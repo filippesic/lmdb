@@ -194,4 +194,9 @@ class UserController extends Controller
 
     }
 
+    public function list()
+    {
+        return response(auth()->user()->load('watchlist'));
+    }
+
 }

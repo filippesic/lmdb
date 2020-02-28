@@ -202,7 +202,6 @@ class UserController extends Controller
     public function list2(Video $video) // testing
     {
         $ids = auth()->user()->watchlist->pluck('id');
-
         //dd(auth()->user()->watchlist);
         //$this->authorize('viewAny', $video);
         $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
@@ -210,11 +209,7 @@ class UserController extends Controller
         ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))->whereIn('videos.id', $ids)
         ->groupBy('videos.id')->orderBy('rating_avg', 'desc')->get();
 
-        
-        
-        return response([
-            $query
-        ]);
+        return response($query);
     }
 
 }

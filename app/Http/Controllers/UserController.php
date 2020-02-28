@@ -174,7 +174,7 @@ class UserController extends Controller
         if (auth()->user()->rated->pluck('rated')->contains('video_id', \request('video_id'))) {
             return response(auth()->user()->rated->pluck('rated')->where('video_id', \request('video_id'))->flatten());
         } else {
-            return response(['message' => 'No videos found mate!'], 404);
+            return response(['message' => 'No rates found for that movie mate!'], 404);
        }
     }
 
@@ -194,9 +194,27 @@ class UserController extends Controller
 
     }
 
-    public function list()
+    public function list(Video $video)
     {
         return response(auth()->user()->load('watchlist'));
+    }
+
+    public function list2(Video $video) // testing
+    {
+        $ids = auth()->user()->watchlist->pluck('id');
+
+        //dd(auth()->user()->watchlist);
+        //$this->authorize('viewAny', $video);
+        $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
+        ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
+        ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))->whereIn('videos.id', $ids)
+        ->groupBy('videos.id')->orderBy('rating_avg', 'desc')->get();
+
+        
+        
+        return response([
+            $query
+        ]);
     }
 
 }

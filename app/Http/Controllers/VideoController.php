@@ -19,7 +19,7 @@ class VideoController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api')->except(['index', 'show', 'top', 'search', 'asdf']);
+        $this->middleware('auth:api')->except(['index', 'show', 'top', 'search', 'ratingList']);
     }
     /**
      * Display a listing of the resource.
@@ -270,7 +270,20 @@ class VideoController extends Controller
         }
     }
 
+    public function ratingList()
+    {
+        //$this->authorize('viewAny', $video);
+
+        $query = Video::leftJoin('rates', 'videos.id', '=', 'rates.video_id')
+            ->select('videos.id', DB::raw('ROUND(AVG(rate), 1) as rating_avg'))
+            ->groupBy('videos.id')->orderBy('rating_avg', 'desc')->get();
+
+        return response()->json($query);
+    }
+
     public function asdf() {
         dd(request()->server('HTTP_HOST'));
     }
+
+
 }

@@ -85,11 +85,12 @@ class VideoController extends Controller
 
         $video = Video::create($validator);
 
-        if (request('seasons')) {
+        //if (request('seasons')) {
             foreach (request('seasons') as $key => $season) {
-                if (!$video->seasons()->exists()) {
-                    $video->seasons()->create(['season_number' => $key + 1]);
-                }
+                //dd(count(\request('seasons')));
+                //if (!$video->seasons()->exists()) {
+                    $video->seasons()->create(['season_number' => $key]);
+                //}
                 foreach ($season['episodes'] as $key2 => $episodeName) {
                     //dd($video->seasons->id);
                     $ep = new Episode();
@@ -99,8 +100,9 @@ class VideoController extends Controller
                     $ep->save();
                 }
                 //$season = $video->seasons()->create(['episodes' => $episode]);
+                //echo $key;
             }
-        }
+        //}
 
         $video->artists()->sync($request->get('artists'));
         $video->genres()->sync($request->get('genres'));

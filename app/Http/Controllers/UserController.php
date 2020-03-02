@@ -87,20 +87,28 @@ class UserController extends Controller
             'name' => 'required|min:3',
             'surname' => 'nullable',
             'email' => 'required',
-            'password' => 'required|min:3',
+            'currentPassword' => 'nullable|string|min:3',
+            'newPassword' => 'required_with:currentPassword|string|min:3',
         ])->validate();
+
+        //dd((Hash::check(request('currentPassword'), auth()->user()->password) ?: 'nope'));
 
         $user->name = \request('name');
         $user->surname = \request('surname');
-        $user->email = \request('email');
-        $user->password = \request('password');
+        $user->email = request('email');
+        if(!empty(request('currentPassword'))) {
+            //dd('im in mate');
+            if(Hash::check(request('currentPassword'), auth()->user()->password)) {
+                $user->password = Hash::make(request('newPassword'));
+            }
+        }
         $user->save();
 
         if (auth()->user()->role->id === 2) {
             return response(['message' => 'Profile edited by administrator user mate']);
         }
 
-        return response(['message' => 'Successfully edited a profile mate!' , $user]);
+        return response(['message' => 'Successfully edited a profile mate!' , 'user' => $user]);
     }
 
     /**

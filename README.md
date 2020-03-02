@@ -2,7 +2,7 @@
 
 ## About this project
 
-This is my second Laravel project, but it's the first REST API based so it's bound to have some bugs and general mistakes with lots of spaghetti code so be aware. :)
+This is my second Laravel project, but it's the first REST API based so it's bound to have some bugs and general mistakes.
 
 ## Routes and initialization
 

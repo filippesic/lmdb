@@ -109,7 +109,7 @@ class UserController extends Controller
             return response([
                 'errors' => [
                     'password' => 'Profile edited by administrator mate'
-            ]])
+            ]]);
 
         }
 

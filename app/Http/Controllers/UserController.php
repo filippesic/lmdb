@@ -106,10 +106,7 @@ class UserController extends Controller
         $user->save();
 
         if (auth()->user()->role->id === 2) {
-            return response([
-                'errors' => [
-                    'password' => 'Profile edited by administrator mate'
-            ]]);
+            return response(['message' => 'Profile edited by administrator mate']);
 
         }
 
@@ -207,19 +204,19 @@ class UserController extends Controller
 
     }
 
-    public function list(Video $video)
+    public function list()
     {
         return response(auth()->user()->load('watchlist'));
     }
 
-    public function list2(Video $video) // testing
+    public function list2()
     {
         $ids = auth()->user()->watchlist->pluck('id');
         //dd(auth()->user()->watchlist);
         //$this->authorize('viewAny', $video);
         $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
         ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
-        ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))->whereIn('videos.id', $ids)
+        ->select('videos.*', DB::raw('ROUND(AVG(rate), 1) as rating_avg'))->whereIn('videos.id', $ids)
         ->groupBy('videos.id')->orderBy('rating_avg', 'desc')->get();
 
         return response($query);

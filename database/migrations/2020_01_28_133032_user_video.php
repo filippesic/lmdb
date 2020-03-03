@@ -17,6 +17,7 @@ class UserVideo extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('video_id');
+            $table->timestamps(); // On delete/destroy user it throws a 1452 error and won't work, or I'm wrong?
 
             $table->unique(['user_id', 'video_id']);
 

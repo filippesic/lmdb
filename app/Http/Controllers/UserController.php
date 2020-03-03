@@ -124,9 +124,9 @@ class UserController extends Controller
     {
         $this->authorize('delete', $user);
 
-       $user->tokens->each(function ($token, $key) {
-            $token->delete();
-        });
+//       $user->tokens->each(function ($token, $key) {
+//            $token->delete();
+//        });
 
         $user->delete();
 

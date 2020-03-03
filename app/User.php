@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function watchlist()
     {
-        return $this->belongsToMany(Video::class)->as('watchlist');
+        return $this->belongsToMany(Video::class)->withTimestamps();
     }
 
 }

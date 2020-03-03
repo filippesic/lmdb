@@ -81,26 +81,29 @@ class VideoController extends Controller
 
         ])->validate();
 
+        //return response(request()->all());
+
         $request->file('poster')->storePubliclyAs('/public/videoPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
 
         $video = Video::create($validator);
 
         //if (request('seasons')) {
             foreach (request('seasons') as $key => $season) {
+                $seas = $video->seasons()->create(['season_number' => $key]);
                 //dd(count(\request('seasons')));
                 //if (!$video->seasons()->exists()) {
-                    $video->seasons()->create(['season_number' => $key]);
                 //}
                 foreach ($season['episodes'] as $key2 => $episodeName) {
                     //dd($video->seasons->id);
                     $ep = new Episode();
-                    $ep->season()->associate($video->seasons[0]);
+                    $ep->season()->associate($seas);
                     //$ep->season_id = $video->seasons()->id;
                     $ep->name = $episodeName;
                     $ep->save();
                 }
                 //$season = $video->seasons()->create(['episodes' => $episode]);
                 //echo $key;
+               // var_dump($video->seasons);
             }
         //}
 

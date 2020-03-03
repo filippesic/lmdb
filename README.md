@@ -2,7 +2,7 @@
 
 ## About this project
 
-This is my second Laravel project, but it's the first REST API based so it's bound to have some bugs and general mistakes with lots of spaghetti code so be aware. :)
+This is my second Laravel project, but it's the first REST API based so it's bound to have some bugs and general mistakes.
 
 ## Routes and initialization
 
@@ -18,7 +18,7 @@ For the routes, standard CRUD routes apply for all(most) models with some custom
 * `POST /register` registers a user
 * * *
 * `/artists` CRUD (policy)
-* `/videos` CRUD (policy) *~~season episodes are just numbers~~* **initial change**
+* `/videos` CRUD (policy) _episodes work now_ `season[number][episode][]` then value is the episode name
 * `/genres` CRUD (policy)
 * `/users` CRUD (policy)
 * * *
@@ -32,12 +32,3 @@ For the routes, standard CRUD routes apply for all(most) models with some custom
 * `POST /user/rates2` takes `video_id` and returns any rates that user has given(`auth:api`)
 * `POST /user/unrate` 'unrates' the movie(`auth:api`)
 * `POST /user/addToList` takes `video_id` and adds a movie to user's watchlist(`auth:api`)
-
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

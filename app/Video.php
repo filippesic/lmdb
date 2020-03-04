@@ -8,7 +8,15 @@ use Illuminate\Support\Facades\Storage;
 
 class Video extends Model
 {
-    protected $hidden = ['created_at', 'updated_at'];
+
+    protected $dates = ['release_date'];
+
+    protected $casts = [
+        'release_date' => 'date:d.m.Y'
+    ];
+
+    protected $hidden = ['created_at', 'updated_at', 'pivot'];
+
     protected  $fillable = ['video_type_id', 'poster', 'name', 'mpaa_rating', 'duration_in_minutes', 'release_date', 'country', 'plot', 'director_id', 'trailer', 'rating'];
 
     public function seasons()

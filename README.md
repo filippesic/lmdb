@@ -18,13 +18,13 @@ For the routes, standard CRUD routes apply for all(most) models with some custom
 * `POST /register` registers a user
 * * *
 * `/artists` CRUD (policy)
-* `/videos` CRUD (policy) *season episodes are just numbers*
+* `/videos` CRUD (policy) *season episodes are just numbers* (_see test branch_)
 * `/genres` CRUD (policy)
 * `/users` CRUD (policy)
 * * *
 * `GET /videos/search` typical search
 * `GET /videos/top` lists top videos
-* `GET /videos/ratingList` list of only video ids and average ratings
+* `GET /videos/ratingList` list of only video ids and average ratings (_kinda useless now_)
 * `GET /actors` lists only artists that are actors(artist_type_id) 
 * `GET /directors` lists only artists that are directors(artist_type_id)
 * `GET /user` shows some data about the user with relationship(`auth:api`)

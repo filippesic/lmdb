@@ -97,7 +97,7 @@ class VideoController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Video  $video
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Video $video)
     {
@@ -105,7 +105,7 @@ class VideoController extends Controller
         $collection = collect($video->rates()->pluck('rate'));
 
         $videoWithRel = Video::with('type', 'rates', 'artists', 'director', 'genres', 'seasons')->findOrFail($video->id);
-        return response([
+        return response()->json([
             'id' => $video->id,
             'video_type_id' => $video->video_type_id,
             'director_id' => $video->director_id,
@@ -115,7 +115,7 @@ class VideoController extends Controller
             'rating_avg' => round($collection->avg(), 1),
             'mpaa_rating' => $video->mpaa_rating,
             'duration_in_minutes' => $video->duration_in_minutes,
-            'release_date' => $video->release_date,
+            'release_date' => $video->release_date->format('d.m.Y'),
             'country' => $video->country,
             'plot' => $video->plot,
             'type' => $video->type()->get(),
@@ -278,12 +278,12 @@ class VideoController extends Controller
             ->select('videos.id', DB::raw('ROUND(AVG(rate), 1) as rating_avg'))
             ->groupBy('videos.id')->orderBy('rating_avg', 'desc')->get();
 
-        return response()->json($query);
+        return response($query);
     }
 
-    public function asdf() {
-        dd(request()->server('HTTP_HOST'));
-    }
+//    public function asdf() {
+//        dd(request()->server('HTTP_HOST'));
+//    }
 
 
 }

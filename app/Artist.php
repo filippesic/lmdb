@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\Storage;
 
 class Artist extends Model
 {
+
+    protected $dates = ['birth_date'];
+
+    protected $casts = [
+        'birth_date' => 'date:d.m.Y'
+    ];
+
     protected $hidden = ['pivot', 'director_id', 'created_at', 'updated_at'];
     protected $fillable = ['artist_type_id', 'poster', 'name', 'surname', 'gender', 'birth_date', 'country', 'bio'];
 

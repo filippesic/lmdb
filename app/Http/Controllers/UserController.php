@@ -20,7 +20,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        
+
     }
 
     /**
@@ -52,21 +52,15 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\JsonResponse
+     * @param \App\User $user
+     * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function show()
+    public function show(User $user)
     {
-        $watchlist = collect(\auth()->user()->watchlist->pluck('id'));
-        $user = \auth()->user();
+        $this->authorize('view', $user);
 
-        return  response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'surname' => $user->surname,
-            'email' => $user->email,
-            'watchlist' => $watchlist,
-        ]);
+        return response(auth()->user());
     }
 
     /**
@@ -104,8 +98,7 @@ class UserController extends Controller
         $user->save();
 
         if (auth()->user()->role->id === 2) {
-            return response(['message' => 'Profile edited by administrator mate']);
-
+            return response(['message' => 'Profile edited by administrator mate', 'user' => $user]);
         }
 
         return response(['message' => 'Successfully edited a profile mate!' , 'user' => $user]);

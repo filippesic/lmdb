@@ -20,9 +20,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('rated')->paginate('20');
-
-        return response($users);
+        
     }
 
     /**
@@ -124,9 +122,9 @@ class UserController extends Controller
     {
         $this->authorize('delete', $user);
 
-//       $user->tokens->each(function ($token, $key) {
-//            $token->delete();
-//        });
+      $user->tokens->each(function ($token, $key) {
+           $token->delete();
+       });
 
         $user->delete();
 
@@ -136,7 +134,7 @@ class UserController extends Controller
         return response(['message' =>'Successfully deleted your profile']);
     }
 
-    public function rate(Video $video)
+    public function rate()
     {
         \request()->validate([
            'video_id' => 'required|integer|nullable',

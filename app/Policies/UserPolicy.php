@@ -39,7 +39,7 @@ class UserPolicy
      */
     public function view(User $user, User $model)
     {
-        return $user->id === $model->id ? Response::allow() : Response::deny('This is not your profile mate, cmon!');
+        return $user->id === auth()->user()->id ? Response::allow() : Response::deny('This is not your profile mate, cmon!');
     }
 
     /**

@@ -22,19 +22,19 @@ For the routes, standard CRUD routes apply for all(most) models with some custom
 * `/genres` CRUD (policy)
 * `/users` CRUD (policy)
 * * *
-* `GET /videos/search` typical search
 * `GET /videos/top` lists top videos
-* `GET /videos/ratingList` list of only video ids and average ratings (_kinda useless now_)
+* `GET /videos/search` typical search
 * `GET /actors` lists only artists that are actors(artist_type_id) 
 * `GET /directors` lists only artists that are directors(artist_type_id)
-* `GET /user` shows some data about the user with relationship(`auth:api`)
+* `GET /user` shows user data(`auth:api`)
 * `GET /user/list` shows a wachlist for the user(`auth:api`)
 * `GET /user/list2` returns user's watchlist with rating_average(`auth:api`)
 * `GET /user/rates` returns rates for the user(`auth:api`)
+* * *
 * `POST /user/rate` rates a movie(`auth:api`), rates and updates
 * `POST /user/rates2` takes `video_id` and returns any rates that user has given(`auth:api`)
 * `POST /user/unrate` 'unrates' the movie(`auth:api`)
-* `POST /user/addToList` takes `video_id` and adds a movie to user's watchlist(`auth:api`)
+* `POST /user/addToList` accepts `video_id` and adds a movie to user's watchlist(`auth:api`)
 
 
 ## Code of Conduct

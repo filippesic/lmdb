@@ -1,6 +1,6 @@
 <p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
 
-## About this project
+## About this project *TEST*
 
 This is my second Laravel project, but it's the first REST API based so it's bound to have some bugs and general mistakes.
 
@@ -8,6 +8,8 @@ This is my second Laravel project, but it's the first REST API based so it's bou
 
 You need to make (L)`lmdb_db`(InnoDB) database and run `migrate`, `seed`, `passport install`, artisan commands first. Password for all users is `321`.
 There are two roles for users which defaults to `role_id` `1`, but you can manually set it to `2`, which is administrator which has basically all privileges.
+
+**_Season/episode seeders aren't finished. `season_number` is bad_**
 
 For the routes, standard CRUD routes apply for all(most) models with some custom ones.
 

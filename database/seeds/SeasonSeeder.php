@@ -11,6 +11,6 @@ class SeasonSeeder extends Seeder
      */
     public function run()
     {
-        factory(\App\Season::class, 20)->create();
+        factory(\App\Season::class, 30)->create();
     }
 }

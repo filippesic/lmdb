@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Artist;
 use App\Episode;
 use App\Rate;
+use App\Season;
 use App\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -292,6 +293,7 @@ class VideoController extends Controller
     }
 
     public function asdf() {
-        dd(request()->server('HTTP_HOST'));
+        //dd(request()->server('HTTP_HOST'));
+        //dd(Season::all()->random()->id);
     }
 }

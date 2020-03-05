@@ -45,8 +45,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UserSeeder::class); // Creates Users
         $this->call(ArtistSeeder::class); // Creates actors and directors
-        //$this->call(VideoSeeder::class); // Creates only for 'TV Shows 20x'
-        //$this->call(SeasonSeeder::class); // Creates seasons only for 'TV shows'
+        $this->call(VideoSeeder::class); // Creates only for 'TV Shows 20x'
+        $this->call(SeasonSeeder::class); // Creates seasons only for 'TV shows'
+        $this->call(EpisodeSeeder::class); // Creates episodes only for 'TV shows'
 
         factory(\App\Video::class, 50)->create([ // Creates only for 'Movies'
             'video_type_id' => 1

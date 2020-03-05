@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 $factory->define(Season::class, function (Faker $faker) {
 
     return [
-        'video_id' => \App\Video::all()->random()->id,
-        'episodes' => $faker->numberBetween($min = 11, $max = 27)
+        'video_id' => \App\Video::where('video_type_id', 2)->get()->random()->id,
+        'season_number' => $faker->numberBetween(1, 6)
     ];
 });

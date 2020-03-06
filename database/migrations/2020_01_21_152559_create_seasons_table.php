@@ -16,7 +16,7 @@ class CreateSeasonsTable extends Migration
         Schema::create('seasons', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('video_id');
-            $table->bigInteger('season_number');
+            $table->integer('season_number');
             $table->timestamps();
 
             $table->foreign('video_id')->references('id')->on('videos')->onDelete('cascade');

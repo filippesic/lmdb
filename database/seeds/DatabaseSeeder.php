@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SeasonSeeder::class); // Creates seasons only for 'TV shows'
         $this->call(EpisodeSeeder::class); // Creates episodes only for 'TV shows'
 
-        factory(\App\Video::class, 50)->create([ // Creates only for 'Movies'
+        factory(\App\Video::class, 20)->create([ // Creates only for 'Movies'
             'video_type_id' => 1
         ]);
 

@@ -12,7 +12,7 @@ class EpisodeSeeder extends Seeder
      */
     public function run()
     {
-        factory(\App\Episode::class, 50)->make()->each(function ($episode) {
+        factory(\App\Episode::class, 800)->make()->each(function ($episode) {
             $episode->season()->associate(Video::all()->random()->id);
             $episode->save();
         });

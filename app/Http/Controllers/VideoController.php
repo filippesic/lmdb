@@ -294,6 +294,7 @@ class VideoController extends Controller
 
     public function asdf() {
         //dd(request()->server('HTTP_HOST'));
-        //dd(Season::all()->random()->id);
+       // dd(\App\Video::all()->random()->seasons()->count(), \App\Video::all()->random()->seasons);
+        dd($vd = ['video_id' => \App\Video::where('video_type_id', 2)->get()->random()->id]);
     }
 }

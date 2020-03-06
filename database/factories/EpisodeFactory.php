@@ -9,6 +9,6 @@ use Faker\Generator as Faker;
 $factory->define(Episode::class, function (Faker $faker) {
     return [
         'season_id' => Season::all()->random()->id,
-        'name' => $faker->sentence(5, true)
+        'name' => $faker->sentence(3, true)
     ];
 });

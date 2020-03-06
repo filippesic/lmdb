@@ -77,16 +77,14 @@ class UserController extends Controller
 
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required|string|min:3',
-            'surname' => 'nullable|string',
+            'surname' => 'sometimes|string',
             'email' => 'required|email',
-            'currentPassword' => [
-                'nullable', 'string', 'min:3', function ($attribute, $value, $fail) use ($user) {
-                    if (!Hash::check(request('currentPassword'), $user->password)) {
-                        return $fail(__('Current Password is incorrect mate.'));
-                    }
-                }],
-            'newPassword' => 'required_with:currentPassword|string|min:3',
+            'currentPassword' => 'sometimes|min:3|password:api',
+            'newPassword' => 'required_with:currentPassword|min:3',
         ])->validate();
+
+        dd($validator);
+        //return response($validator);
 
         //dd((Hash::check(request('currentPassword'), auth()->user()->password) ?: 'nope'));
 
@@ -94,16 +92,8 @@ class UserController extends Controller
         $user->surname = request('surname');
         $user->email = request('email');
 
-        if (empty(request('currentPassword')) && !empty(request('newPassword'))) {
-                return response([
-                    'errors' => [
-                        'newPassword' => 'Old password cannot be empty ya\' fool :D'
-                    ]
-                ], 422);
-        } else {
-            $request->user()->fill([
-                'password' => Hash::make($request->newPassword)
-            ]);
+        if (\request('newPassword')) {
+            $user->password = Hash::make(\request('newPassword'));
         }
 
         $user->save();

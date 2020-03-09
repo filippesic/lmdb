@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -79,11 +80,18 @@ class UserController extends Controller
             'name' => 'required|string|min:3',
             'surname' => 'sometimes|string',
             'email' => 'required|email',
-            'currentPassword' => 'sometimes|min:3|password:api',
-            'newPassword' => 'required_with:currentPassword|min:3',
+            'currentPassword' => 'required_with:newPassword|min:2|password:api',
+            'newPassword' => 'required_with:currentPassword|min:3|confirmed'
+//            'newPassword' => Rule::requiredIf(function () use ($request) {
+//                if(!empty($request->currentPassword) && !is_null($request->currentPassword)) {
+//                    return true;
+//                } else {
+//                    return response(['message' => 'New password is finally required mate, no open doors anymore hesuuus']);
+//                }
+//            }),
         ])->validate();
 
-        dd($validator);
+        //dd($validator);
         //return response($validator);
 
         //dd((Hash::check(request('currentPassword'), auth()->user()->password) ?: 'nope'));
@@ -91,10 +99,14 @@ class UserController extends Controller
         $user->name = request('name');
         $user->surname = request('surname');
         $user->email = request('email');
-
         if (\request('newPassword')) {
             $user->password = Hash::make(\request('newPassword'));
         }
+//        if (!request('currentPassword')) {
+//            return response(['message' => 'New password is finally required with current password mate, no open doors anymore hessuuus'], 422);
+//        } else {
+//            $user->password = Hash::make(\request('newPassword'));
+//        }
 
         $user->save();
 

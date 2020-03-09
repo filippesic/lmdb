@@ -91,22 +91,15 @@ class UserController extends Controller
 //            }),
         ])->validate();
 
-        //dd($validator);
-        //return response($validator);
-
         //dd((Hash::check(request('currentPassword'), auth()->user()->password) ?: 'nope'));
 
         $user->name = request('name');
         $user->surname = request('surname');
         $user->email = request('email');
+        
         if (\request('newPassword')) {
             $user->password = Hash::make(\request('newPassword'));
         }
-//        if (!request('currentPassword')) {
-//            return response(['message' => 'New password is finally required with current password mate, no open doors anymore hessuuus'], 422);
-//        } else {
-//            $user->password = Hash::make(\request('newPassword'));
-//        }
 
         $user->save();
 

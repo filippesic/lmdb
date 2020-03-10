@@ -27,7 +27,7 @@ For the routes, standard CRUD routes apply for all(most) models with some custom
 * `GET /actors` lists only artists that are actors(artist_type_id) 
 * `GET /directors` lists only artists that are directors(artist_type_id)
 * `GET /user` shows user data(`auth:api`)
-* `GET /user/list` shows a wachlist for the user(`auth:api`)
+* `GET /user/watchlistId` shows video ids for user watchlist(`auth:api`)
 * `GET /user/list2` returns user's watchlist with rating_average(`auth:api`)
 * `GET /user/rates` returns rates for the user(`auth:api`)
 * * *

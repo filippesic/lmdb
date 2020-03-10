@@ -31,7 +31,7 @@ class VideoController extends Controller
         $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
             ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
             ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))
-            ->groupBy('videos.id')->orderBy('rating_avg', 'desc')
+            ->groupBy('videos.id')->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return response($query);
@@ -41,6 +41,7 @@ class VideoController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
+     * @param Video $video
      * @return \Illuminate\Http\Response
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */

@@ -34,8 +34,8 @@ class Artist extends Model
 
     public function getPosterAttribute($value)
     {
-        if(strpos($value, 'artist_id_')) { // Works for seeded images and uploaded as well
-            return $value;
+        if(strpos($value, 'artist')) { // Not working, still goes to artistsPosters folder and not images
+            return url(Storage::url('images/' . $value));
         } else {
             return url(Storage::url('artistsPosters/' . $value));
         }

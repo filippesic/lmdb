@@ -96,7 +96,7 @@ class UserController extends Controller
         $user->name = request('name');
         $user->surname = request('surname');
         $user->email = request('email');
-        
+
         if (\request('newPassword')) {
             $user->password = Hash::make(\request('newPassword'));
         }
@@ -201,9 +201,13 @@ class UserController extends Controller
 
     }
 
-    public function list()
+    public function watchlistId()
     {
-        return response(auth()->user()->load('watchlist'));
+//        return response(auth()->user()->load('watchlist'));
+        return response()->json([
+            //'user' => auth()->user(),
+            'watchlist' => auth()->user()->watchlist->pluck('id')
+        ]);
     }
 
     public function list2()

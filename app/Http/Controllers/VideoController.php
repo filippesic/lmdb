@@ -28,19 +28,24 @@ class VideoController extends Controller
      */
     public function index()
     {
-       // dd(\request()->all());
-        \request()->validate([
-            'sort' => 'sometimes', Rule::in('name', 'rating_avg', 'release_date', 'country'),
-            'dir' => 'sometimes|string', Rule::in('asc', 'desc'),
+       // return response(\request()->all());
+        request()->validate([
+            'offset' => 'required|integer',
+            'limit' => 'required|integer',
+            'sort' => ['sometimes', Rule::in('name', 'rating_avg', 'release_date', 'country')],
+            'dir' => ['sometimes','string', Rule::in('asc', 'desc')],
         ]);
+
+        $total = Video::all()->count();
 
         $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
             ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
             ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))
-            ->groupBy('videos.id')->orderBy(\request('sort') ?? 'created_at', \request('dir') ?? 'desc')
-            ->paginate(20);
+            ->groupBy('videos.id')->orderBy(request('sort') ?? 'created_at', request('dir') ?? 'desc')
+            ->skip(request('offset'))
+            ->take(request('limit'))->get();
 
-        return response($query);
+        return response(['videos' => $query, 'total' => $total]);
     }
 
     /**

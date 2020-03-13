@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 |
 */
 
-//Route::get('/test', 'VideoController@asdf');
+Route::get('/test', 'VideoController@asdf');
 
 Route::post('login', 'AuthController@login');
 Route::post('register', 'AuthController@register');

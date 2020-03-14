@@ -264,8 +264,7 @@ class VideoController extends Controller
         $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
             ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
             ->select('videos.*', DB::raw('ROUND(AVG(rate), 1) as rating_avg'))
-            ->groupBy('videos.id')->orderBy('rating_avg', 'desc')
-            ->paginate(20);
+            ->groupBy('videos.id')->orderBy('rating_avg', 'desc')->take(100)->get();
 
         return response($query);
     }

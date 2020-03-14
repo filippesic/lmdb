@@ -57,11 +57,21 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function show(User $user)
+    public function show()
     {
         //$this->authorize('view', $user);
 
-        return response(auth()->user()->load('role'));
+        $query = auth()->user()->watchlist->pluck('id');
+        $videos = Video::with('type', 'artists', 'director', 'genres', 'seasons')
+            ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
+            ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))->whereIn('videos.id', $query)
+            ->groupBy('videos.id')->orderBy(request('sort') ?? 'created_at', request('dir') ?? 'desc')->get();
+
+        $user = \auth()->user();
+        $user->watchlist = $videos;
+
+        return response($user);
+
     }
 
     /**

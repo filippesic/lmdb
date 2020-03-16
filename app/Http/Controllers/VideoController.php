@@ -274,8 +274,8 @@ class VideoController extends Controller
         if ($request->get('query')) {
             $query = $request->get('query');
 
-            $videos = Video::where('name', 'LIKE', '%' . $query . '%')->paginate(20);
-            $videos->appends(['query' => $query]);
+            $videos = Video::where('name', 'LIKE', '%' . $query . '%')->skip(\request('offset'))->take(\request('limit'))->get();
+            $videos->query = $query;
 
             return response($videos);
         } else {

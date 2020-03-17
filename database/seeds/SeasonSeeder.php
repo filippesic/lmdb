@@ -1,5 +1,6 @@
 <?php
 
+use App\Season;
 use Illuminate\Database\Seeder;
 
 class SeasonSeeder extends Seeder
@@ -11,6 +12,6 @@ class SeasonSeeder extends Seeder
      */
     public function run()
     {
-        factory(\App\Season::class, 20)->create();
+        factory(Season::class, 20)->create();
     }
 }

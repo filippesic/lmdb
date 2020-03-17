@@ -1,5 +1,9 @@
 <?php
 
+use App\Artist;
+use App\Genre;
+use App\User;
+use App\Video;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -48,24 +52,22 @@ class DatabaseSeeder extends Seeder
         $this->call(VideoSeeder::class); // Creates only for 'TV Shows 20x'
         $this->call(SeasonSeeder::class); // Creates seasons only for 'TV shows'
 
-        factory(\App\Video::class, 3000)->create([ // Creates only for 'Movies'
+        factory(Video::class, 950)->create([ // Creates only for 'Movies'
             'video_type_id' => 1
         ]);
 
-        $videos = \App\Video::all()->random()->get();
-        $users = \App\User::with('rated')->get();
+        $videos = Video::inRandomOrder()->get();
+        $users = User::with('rated')->get();
 
         foreach ($videos as $video) {
-            for($i = 0; $i < 3; $i++) {
-                $video->genres()->attach(\App\Genre::all()->unique()->random()->id); // Populating pivot table for video genres
+            for($i = 0; $i < 2; $i++) {
+                $video->genres()->attach(Genre::all()->unique()->random()->id); // Populating pivot table for video genres
             }
             for($i = 0; $i < 5; $i++) {
-                $video->artists()->attach(\App\Artist::all()->unique()->random()->id); // Populating pivot table for video artists
+                $video->artists()->attach(Artist::all()->unique()->random()->id); // Populating pivot table for video artists
             }
-
-            foreach ($users->random(10) as $user) {
-                $user->rated()->attach($video->id, ['rate' => rand(1, 10)]); // Populating pivot table for video artists
-               // \Illuminate\Support\Facades\DB::table('rates')->insert([]);
+            foreach ($users->random(3)->unique() as $user) {
+                $user->rated()->attach($video->id, ['rate' => rand(1, 10)]); // Populating rates table for user rates
             }
         }
     }

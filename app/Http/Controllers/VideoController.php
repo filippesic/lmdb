@@ -269,18 +269,22 @@ class VideoController extends Controller
         return response($query);
     }
 
-    public function search(Request $request)
+    public function search()
     {
-        if ($request->get('query')) {
-            $query = $request->get('query');
+            $validator = request()->validate([
+                'query' => 'required|string|min:2',
+                'offset' => 'required|numeric',
+                'limit' => 'required|numeric'
+            ]);
 
-            $videos = Video::where('name', 'LIKE', '%' . $query . '%')->skip(\request('offset'))->take(\request('limit'))->get();
-            $videos->query = $query;
+            $query = $validator['query'];
+            $raw = DB::table('videos')->where('name', 'LIKE', '%' . $query . '%');
+            $total = $raw->count();
+            $videos = $raw->skip($validator['offset'])->take($validator['limit'])->get();
 
-            return response($videos);
-        } else {
-            return response(['message' => 'No search query mate']);
-        }
+            return response(['videos' => $videos, 'total' => $total]);
+
+
     }
 
     public function ratingList()

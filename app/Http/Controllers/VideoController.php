@@ -32,22 +32,54 @@ class VideoController extends Controller
     {
         // return response(\request()->all());
         request()->validate([
-            'offset' => 'required|integer',
-            'limit' => 'required|integer',
-            'sort' => ['sometimes', Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
+            'offset' => 'sometimes|integer',
+            'limit' => 'sometimes|integer',
+            'sortArt' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
+            'sortGen' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
+            'sort' => ['sometimes', 'string', 'min:3', Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
             'dir' => ['sometimes', 'string', Rule::in('asc', 'desc')],
         ]);
 
         $total = Video::all()->count();
 
-        $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
-            ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
-            ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))
-            ->groupBy('videos.id')->orderBy(request('sort') ?? 'created_at', request('dir') ?? 'desc')
-            ->skip(request('offset'))
-            ->take(request('limit'))->get();
+        $queryGenre = Video::whereHas("genres", function($q){
+            $q->where("genres.name", "=", \request('sortGen'));
+        })->with('genres');
+        $queryGenreLimit = $queryGenre->skip(request('offset') ?? 0)->take(request('limit') ?? 5)->get();
 
-        return response(['videos' => $query, 'total' => $total]);
+        $queryArtists = Video::whereHas("artists", function($q){
+            $q->where("artists.name", "=", \request('sortArt'));
+        })->with('genres');
+        $queryArtistsLimit = $queryGenre->skip(request('offset') ?? 0)->take(request('limit') ?? 5)->get();
+
+        $totalGen = $queryGenre->count();
+        $totalArt = $queryArtists->count();
+
+        if (request('sortGen')) {
+            return response(['videos' => $queryGenreLimit, 'total' => $totalGen]);
+        } elseif (request('sortGen')) {
+            return response(['videos' => $queryArtistsLimit, 'total' => $totalArt]);
+        } else {
+            $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
+                ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
+                ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))
+                ->groupBy('videos.id')->orderBy(request('sort') ?? 'created_at', request('dir') ?? 'asc')
+                ->skip(request('offset') ?? 0)
+                ->take(request('limit') ?? 5)->get();
+
+            return response(['videos' => $query, 'total' => $total]);
+        }
+
+//        $queryGenre = Video::with('type', 'artists', 'director', 'genres', 'seasons')
+//            ->join('genre_video', 'videos.id', '=', 'genre_video.video_id')
+//            ->join('genres', 'genres.id', '=', 'genre_video.genre_id')
+//            ->select('*')->where('genres.name', 'LIKE', '%Drama%')->orderBy('videos.created_at', 'desc')->get();
+
+//        $queryArtists = Video::with('type', 'artists', 'director', 'genres', 'seasons')
+//            ->join('artist_video', 'videos.id', '=', 'artist_video.video_id')
+//            ->join('artists', 'artists.id', '=', 'artist_video.artist_id')
+//            ->select('*')->orderBy('artists.name', 'desc')->get();
+
     }
 
     /**
@@ -271,18 +303,18 @@ class VideoController extends Controller
 
     public function search()
     {
-            $validator = request()->validate([
-                'query' => 'required|string|min:2',
-                'offset' => 'required|numeric',
-                'limit' => 'required|numeric'
-            ]);
+        $validator = request()->validate([
+            'query' => 'required|string|min:2',
+            'offset' => 'required|numeric',
+            'limit' => 'required|numeric'
+        ]);
 
-            $query = $validator['query'];
-            $raw = DB::table('videos')->where('name', 'LIKE', '%' . $query . '%');
-            $total = $raw->count();
-            $videos = $raw->skip($validator['offset'])->take($validator['limit'])->get();
+        $query = $validator['query'];
+        $raw = DB::table('videos')->where('name', 'LIKE', '%' . $query . '%');
+        $total = $raw->count();
+        $videos = $raw->skip($validator['offset'])->take($validator['limit'])->get();
 
-            return response(['videos' => $videos, 'total' => $total]);
+        return response(['videos' => $videos, 'total' => $total]);
 
 
     }
@@ -373,7 +405,7 @@ class VideoController extends Controller
 
             while ($i < strlen($binaryString)) {
 
-                while($binaryString[$i] == 1) {
+                while ($binaryString[$i] == 1) {
                     $i++;
                 }
                 echo '$i after finding first one: ' . $i . "<br>";
@@ -400,7 +432,8 @@ class VideoController extends Controller
 //
 //        echo "<br>" . "Result: " . $res;
 
-        function arrayRotate(array $arr, int $rot) {
+        function arrayRotate(array $arr, int $rot)
+        {
 
             $rotated = [];
 
@@ -420,32 +453,34 @@ class VideoController extends Controller
 
         ///////////////////////////////////////////////////////////////////////////////
 
-        function oddOccurrencesInArray($A) {
+        function oddOccurrencesInArray($A)
+        {
             rsort($A);
             $count = array_count_values($A);
             $theOne = 0;
             $min = 0;
 
             foreach ($count as $value => $occurrence) {
-                if($occurrence == 1) {
+                if ($occurrence == 1) {
                     $theOne = $value;
                 }
             }
 
-            return  $theOne;
+            return $theOne;
 
         }
 
         $ex = [9, 3, 9, 3, 9, 7, 9];
         $rez = oddOccurrencesInArray($ex);
-       // dd($rez);
+        // dd($rez);
 
 
-        function frogJmp(int $x, int $y, int $d) {
+        function frogJmp(int $x, int $y, int $d)
+        {
             $distance = $y - $x;
-            $steps = (int) ceil($distance / $d);
+            $steps = (int)ceil($distance / $d);
 
-            if($x >= $y) {
+            if ($x >= $y) {
                 return false;
             } else {
                 return $steps;
@@ -456,14 +491,15 @@ class VideoController extends Controller
         //dd($res);
 
 
-        function permMissingElem(array $a) {
+        function permMissingElem(array $a)
+        {
             sort($a);
             $goodArray = [];
             if (empty($a) || in_array(null, $a)) {
                 return 0;
             } elseif (count($a) == 1) {
                 return array_pop($a);
-            } elseif(count($a) == 2 && $a[0] == $a[1]) {
+            } elseif (count($a) == 2 && $a[0] == $a[1]) {
                 return array_pop($a);
             } else {
                 for ($i = 1; $i <= count($a); $i++) {
@@ -479,16 +515,17 @@ class VideoController extends Controller
         //dd($res);
 
 
-        function frogRiverOne(int $x, array $a) {
+        function frogRiverOne(int $x, array $a)
+        {
             $keysTime = array_keys($a);
             $lowestTime = 0;
 
-            if(!in_array($x, $keysTime) || count(array_unique($a)) == 1) {
+            if (!in_array($x, $keysTime) || count(array_unique($a)) == 1) {
                 return -1;
             } else {
                 foreach ($a as $time => $position) {
                     if ($position == $x) {
-                       $lowestTime =  $time;
+                        $lowestTime = $time;
                     }
                 }
             }
@@ -498,7 +535,7 @@ class VideoController extends Controller
 
         $example = [4];
 
-        $res2 = frogRiverOne(5 , $example);
+        $res2 = frogRiverOne(5, $example);
         dd($res2);
 
     }

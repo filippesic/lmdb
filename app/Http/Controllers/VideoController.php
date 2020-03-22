@@ -34,38 +34,57 @@ class VideoController extends Controller
         request()->validate([
             'offset' => 'sometimes|integer',
             'limit' => 'sometimes|integer',
-            'sortArt' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
-            'sortGen' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
-            'sort' => ['sometimes', 'string', 'min:3', Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
+            'artist' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
+            'genre' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
+            'ord' => ['sometimes', 'string', /*Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')*/],
             'dir' => ['sometimes', 'string', Rule::in('asc', 'desc')],
         ]);
 
         $total = Video::all()->count();
 
-        $queryGenre = Video::whereHas("genres", function($q){
-            $q->where("genres.name", "=", \request('sortGen'));
+        $queryGenre = Video::whereHas('genres', function($q){
+            $q->where('genres.name', 'like', '%'. \request('genre') . '%');
         })->with('genres');
-        $queryGenreLimit = $queryGenre->skip(request('offset') ?? 0)->take(request('limit') ?? 5)->get();
 
-        $queryArtists = Video::whereHas("artists", function($q){
-            $q->where("artists.name", "=", \request('sortArt'));
-        })->with('genres');
-        $queryArtistsLimit = $queryGenre->skip(request('offset') ?? 0)->take(request('limit') ?? 5)->get();
+        $totalGenre = $queryGenre->count();
 
-        $totalGen = $queryGenre->count();
-        $totalArt = $queryArtists->count();
+        //dd($queryGenre->count());
 
-        if (request('sortGen')) {
-            return response(['videos' => $queryGenreLimit, 'total' => $totalGen]);
-        } elseif (request('sortGen')) {
-            return response(['videos' => $queryArtistsLimit, 'total' => $totalArt]);
+        $queryGenreLimit = $queryGenre->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
+            ->select(DB::raw('videos.*, AVG(rate) as rating_avg'))
+            ->groupBy('videos.id')
+            ->orderBy(\request('ord') ?? 'videos.created_at', \request('dir') ?? 'asc')
+            ->skip(request('offset') ?? 0)
+            ->take(request('limit') ?? 5)
+            ->get();
+       // dd($queryGenreLimit);
+
+        $queryArtists = Video::whereHas('artists', function($q){
+            $q->where('artists.name', 'like', '%'. \request('artist'). '%');
+        })->with('artists');
+
+        $totalArtists = $queryArtists->count();
+
+        $queryArtistsLimit = $queryArtists->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
+            ->select(DB::raw('videos.*, AVG(rate) as rating_avg'))
+            ->groupBy('videos.id')->orderBy(\request('ord') ?? 'videos.created_at', \request('dir') ?? 'asc')
+            ->skip(request('offset') ?? 0)
+            ->take(request('limit') ?? 5)
+            ->get();
+        //dd($queryArtistsLimit);
+
+        if (request('genre')) {
+            return response(['videos' => $queryGenreLimit, 'total' => $totalGenre]);
+        } elseif (request('artist')) {
+            return response(['videos' => $queryArtistsLimit, 'total' => $totalArtists]);
         } else {
             $query = Video::with('type', 'artists', 'director', 'genres', 'seasons')
                 ->leftJoin('rates', 'videos.id', '=', 'rates.video_id')
                 ->select('videos.*', DB::raw('AVG(rate) as rating_avg'))
-                ->groupBy('videos.id')->orderBy(request('sort') ?? 'created_at', request('dir') ?? 'asc')
+                ->groupBy('videos.id')->orderBy(request('ord') ?? 'created_at', request('dir') ?? 'asc')
                 ->skip(request('offset') ?? 0)
-                ->take(request('limit') ?? 5)->get();
+                ->take(request('limit') ?? 5)
+                ->get();
 
             return response(['videos' => $query, 'total' => $total]);
         }

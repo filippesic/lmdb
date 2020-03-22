@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
         $this->call(VideoSeeder::class); // Creates only for 'TV Shows 20x'
         $this->call(SeasonSeeder::class); // Creates seasons only for 'TV shows'
 
-        factory(Video::class, 950)->create([ // Creates only for 'Movies'
+        factory(Video::class, 500)->create([ // Creates only for 'Movies'
             'video_type_id' => 1
         ]);
 

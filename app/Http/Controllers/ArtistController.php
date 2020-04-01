@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ArtistController extends Controller
 {
@@ -81,25 +82,27 @@ class ArtistController extends Controller
     {
         $this->authorize('update', $artist);
 
-        $input = $request->all();
+        //$input = $request->all();
 
-        Validator::make($input, [
-            'artist_type_id' => 'required',
-            'poster' => 'required',
-            'name' => 'required|min:2',
-            'surname' => 'required|min:2',
-            'gender' => 'required',
-            'birth_date' => 'required',
+        $validator = Validator::make(\request()->all(), [
+            'artist_type_id' => 'required|numeric',
+            'poster' => 'required|image',
+            'name' => 'required|string|min:2',
+            'surname' => 'required|string|min:2',
+            'gender' => ['required', Rule::in(['m', 'f'])],
+            'birth_date' => 'required|date',
             'country' => 'required|min:2',
         ])->validate();
 
-        $artist->poster = $input['poster'];
-        $artist->artist_type_id = $input['artist_type_id'];
-        $artist->name = $input['name'];
-        $artist->surname = $input['surname'];
-        $artist->gender = $input['gender'];
-        $artist->birth_date = $input['birth_date'];
-        $artist->country = $input['country'];
+        $request->file('poster')->storePubliclyAs('/public/artistsPosters', $validator['poster'] = Str::random(40) . '.' . $request->file('poster')->guessClientExtension());
+
+        $artist->poster = $validator['poster'];
+        $artist->artist_type_id = $validator['artist_type_id'];
+        $artist->name = $validator['name'];
+        $artist->surname = $validator['surname'];
+        $artist->gender = $validator['gender'];
+        $artist->birth_date = $validator['birth_date'];
+        $artist->country = $validator['country'];
         $artist->save();
 
         return response($artist);

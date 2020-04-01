@@ -36,14 +36,14 @@ class VideoController extends Controller
             'limit' => 'sometimes|integer',
             'artist' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
             'genre' => 'sometimes|string|min:3', //Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
-            'ord' => ['sometimes', 'string', /*Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')*/],
+            'ord' => ['sometimes', 'string', Rule::in('name', 'rating_avg', 'release_date', 'country', 'created_at')],
             'dir' => ['sometimes', 'string', Rule::in('asc', 'desc')],
         ]);
 
         $total = Video::all()->count();
 
         $queryGenre = Video::whereHas('genres', function($q){
-            $q->where('genres.name', 'like', '%'. \request('genre') . '%');
+            $q->where('genres.name', 'like', '%'. \request('genre') . '%')->orderBy('genres.name', 'desc');
         })->with('genres');
 
         $totalGenre = $queryGenre->count();
@@ -299,9 +299,11 @@ class VideoController extends Controller
 
         if (is_file(storage_path() . '/app/public/videoPosters/' . $video->getOriginal('poster'))) {
             Storage::delete('public/videoPosters/' . $video->getOriginal('poster'));
-        } else {
-            return response(['message' => 'File not deleted. It doesn\'t exist']);
         }
+//        } else {
+//            return response(['message' => 'File not deleted. It doesn\'t exist']);
+//        }
+        
         $video->seasons()->delete();
         $video->delete();
 
